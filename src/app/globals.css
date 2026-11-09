@@ -1,0 +1,351 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Let Me Finish — design tokens
+
+   Editorial and calm. Deep ink, warm off-white and a restrained teal carry the
+   interface; the violet-to-cyan "voice" gradient from the app icon is kept for
+   a few brand moments only.
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --paper: #f8f7f3;
+  --surface: #ffffff;
+  --surface-sunk: #f1efe8;
+  --ink: #10243a;
+  --ink-soft: #3b4d62;
+  --ink-faint: #55667a;
+  --line: #dedad0;
+  --line-strong: #7b8998;
+
+  --teal: #176d73;
+  --teal-deep: #0f5257;
+  --teal-wash: #e1efee;
+  --on-teal: #ffffff;
+
+  --violet: #5a3fd0;
+  --violet-wash: #eeeafb;
+
+  --warn: #7a4a00;
+  --warn-wash: #fbf0d8;
+  --danger: #a12c2c;
+  --danger-deep: #822020;
+  --danger-wash: #fbe8e6;
+  --on-danger: #ffffff;
+
+  --focus: #5a3fd0;
+  --shadow: 0 1px 2px rgb(16 36 58 / 0.06), 0 4px 16px rgb(16 36 58 / 0.05);
+  --voice-gradient: linear-gradient(120deg, #b98cff 0%, #6a5bff 42%, #2e8bff 74%, #27c4ee 100%);
+}
+
+/* Dark values, shared by the explicit setting and the system preference. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #0b1828;
+  --surface: #10243a;
+  --surface-sunk: #0d1d30;
+  --ink: #f4f2ec;
+  --ink-soft: #c5cfdb;
+  --ink-faint: #a3b3c4;
+  --line: #223a55;
+  --line-strong: #7088a0;
+
+  --teal: #74d4d8;
+  --teal-deep: #97e2e5;
+  --teal-wash: #123a41;
+  --on-teal: #06202a;
+
+  --violet: #b9a4ff;
+  --violet-wash: #25204f;
+
+  --warn: #f3cd7e;
+  --warn-wash: #3a2d10;
+  --danger: #ffaaa3;
+  --danger-deep: #ffc4bf;
+  --danger-wash: #46201f;
+  --on-danger: #2b0b0a;
+
+  --focus: #c9b8ff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --paper: #0b1828;
+    --surface: #10243a;
+    --surface-sunk: #0d1d30;
+    --ink: #f4f2ec;
+    --ink-soft: #c5cfdb;
+    --ink-faint: #a3b3c4;
+    --line: #223a55;
+    --line-strong: #7088a0;
+
+    --teal: #74d4d8;
+    --teal-deep: #97e2e5;
+    --teal-wash: #123a41;
+    --on-teal: #06202a;
+
+    --violet: #b9a4ff;
+    --violet-wash: #25204f;
+
+    --warn: #f3cd7e;
+    --warn-wash: #3a2d10;
+    --danger: #ffaaa3;
+    --danger-deep: #ffc4bf;
+    --danger-wash: #46201f;
+    --on-danger: #2b0b0a;
+
+    --focus: #c9b8ff;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
+  }
+}
+
+/* Higher contrast: stronger text and boundaries, on request or by system setting. */
+:root[data-contrast="more"] {
+  --ink-soft: var(--ink);
+  --ink-faint: var(--ink);
+  --line: var(--line-strong);
+  --line-strong: var(--ink);
+}
+@media (prefers-contrast: more) {
+  :root:not([data-contrast="normal"]) {
+    --ink-soft: var(--ink);
+    --ink-faint: var(--ink);
+    --line: var(--line-strong);
+    --line-strong: var(--ink);
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunk: var(--surface-sunk);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-teal-wash: var(--teal-wash);
+  --color-on-teal: var(--on-teal);
+  --color-violet: var(--violet);
+  --color-violet-wash: var(--violet-wash);
+  --color-warn: var(--warn);
+  --color-warn-wash: var(--warn-wash);
+  --color-danger: var(--danger);
+  --color-danger-deep: var(--danger-deep);
+  --color-danger-wash: var(--danger-wash);
+  --color-on-danger: var(--on-danger);
+  --color-focus: var(--focus);
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-display-face), ui-serif, Georgia, Cambria, "Times New Roman", serif;
+
+  --shadow-card: var(--shadow);
+  --radius-card: 1rem;
+  --radius-control: 0.75rem;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+
+html {
+  /* The user's text-size setting scales every rem in the interface. */
+  font-size: calc(100% * var(--font-scale, 1));
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+/* One consistent, highly visible focus indicator everywhere. */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 0.375rem;
+}
+
+::selection {
+  background: var(--teal-wash);
+  color: var(--ink);
+}
+
+a {
+  text-underline-offset: 0.2em;
+}
+
+/* Respect reduced motion, whether asked for by the system or in our settings. */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) *,
+  :root:not([data-motion="full"]) *::before,
+  :root:not([data-motion="full"]) *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Small shared pieces
+   --------------------------------------------------------------------------- */
+
+@utility voice-gradient {
+  background-image: var(--voice-gradient);
+}
+
+@utility voice-text {
+  background-image: var(--voice-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility safe-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+@utility tap {
+  min-height: 3rem;
+  min-width: 3rem;
+}
+
+/* Long-form reading (library articles, lesson text). */
+.prose-lmf {
+  max-width: 38rem;
+}
+.prose-lmf > * + * {
+  margin-top: 1rem;
+}
+.prose-lmf h2 {
+  font-size: 1.375rem;
+  margin-top: 2rem;
+}
+.prose-lmf h3 {
+  font-size: 1.125rem;
+  margin-top: 1.5rem;
+}
+.prose-lmf ul,
+.prose-lmf ol {
+  padding-left: 1.25rem;
+}
+.prose-lmf ul {
+  list-style: disc;
+}
+.prose-lmf ol {
+  list-style: decimal;
+}
+.prose-lmf li + li {
+  margin-top: 0.375rem;
+}
+.prose-lmf a {
+  color: var(--teal);
+  text-decoration: underline;
+}
+.prose-lmf strong {
+  font-weight: 650;
+}
+
+/* Native dialog */
+dialog.lmf-dialog {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 0;
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.28);
+  margin: auto;
+}
+dialog.lmf-dialog::backdrop {
+  background: rgb(8 16 28 / 0.55);
+}
+
+/* Range inputs get a comfortable touch height and our accent. */
+input[type="range"] {
+  accent-color: var(--teal);
+  min-height: 2.75rem;
+  width: 100%;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--teal);
+}
+
+/* A gentle breathing pulse used only where motion carries meaning. */
+@keyframes lmf-breathe {
+  0%,
+  100% {
+    transform: scale(0.82);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
+@keyframes lmf-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fade-in {
+  animation: lmf-fade-in 220ms ease-out both;
+}
+
+/* Print: the "I stammer" card and listener guide should print cleanly. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}
