@@ -138,6 +138,8 @@ export interface ChatMessage {
   edited?: boolean;
   /** How this turn was entered. */
   via?: "voice" | "text";
+  /** Which line of the script this was, when the scripted partner is speaking. */
+  beat?: number;
 }
 
 export interface CustomScenario {
