@@ -1,3 +1,10 @@
+import { PublicShell } from "@/components/app-shell";
+import { Welcome } from "@/components/welcome";
+
 export default function Page() {
-  return <h1 className="p-8 text-3xl">Let Me Finish</h1>;
+  return (
+    <PublicShell>
+      <Welcome />
+    </PublicShell>
+  );
 }
