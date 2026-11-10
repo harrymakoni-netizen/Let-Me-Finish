@@ -2,11 +2,11 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "@/lib/util";
 
-type Variant = "primary" | "secondary" | "quiet" | "danger";
+type Variant = "primary" | "accent" | "light" | "secondary" | "quiet" | "danger";
 type Size = "sm" | "md" | "lg" | "xl";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-control font-semibold text-center select-none " +
+  "inline-flex items-center justify-center gap-2 rounded-control font-semibold text-center tracking-[-0.005em] select-none " +
   "transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-55 " +
   "aria-disabled:cursor-not-allowed aria-disabled:opacity-55";
 
@@ -18,8 +18,10 @@ const sizes: Record<Size, string> = {
 };
 
 const variants: Record<Variant, string> = {
-  primary: "bg-teal text-on-teal hover:bg-teal-deep",
-  secondary: "bg-surface text-ink border border-line-strong hover:bg-sunk",
+  primary: "bg-ink text-paper hover:bg-teal-deep hover:text-on-teal",
+  accent: "bg-teal text-on-teal hover:bg-teal-deep",
+  light: "bg-on-panel text-panel hover:bg-white",
+  secondary: "bg-transparent text-ink border border-line-strong hover:bg-sunk",
   quiet: "text-teal hover:bg-teal-wash underline-offset-4 hover:underline",
   danger: "bg-danger text-on-danger hover:bg-danger-deep",
 };

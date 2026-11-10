@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Info, TriangleAlert } from "lucide-react";
+import { ArrowLeft, ArrowRight, Info, TriangleAlert } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "@/lib/util";
 
@@ -11,7 +11,7 @@ export function Card({
 }: { as?: "div" | "section" | "article" | "li" } & ComponentProps<"div">) {
   return (
     <Tag
-      className={cx("rounded-card border border-line bg-surface p-5 shadow-card sm:p-6", className)}
+      className={cx("rounded-card border border-line bg-surface p-5 sm:p-7", className)}
       {...(rest as object)}
     >
       {children}
@@ -19,7 +19,7 @@ export function Card({
   );
 }
 
-/** A whole card that is one link. */
+/** A whole row that is one link: hairline-separated, no box, a quiet arrow. */
 export function LinkCard({
   href,
   title,
@@ -39,21 +39,21 @@ export function LinkCard({
     <Link
       href={href}
       className={cx(
-        "group flex min-h-16 items-start gap-4 rounded-card border border-line bg-surface p-4 shadow-card",
-        "transition-colors hover:border-teal hover:bg-teal-wash sm:p-5",
+        "group flex min-h-16 items-start gap-4 rounded-card border border-line bg-surface px-5 py-4",
+        "transition-[border-color,background-color,transform] duration-200 hover:border-ink hover:bg-surface sm:px-6 sm:py-5",
         className,
       )}
     >
-      {icon ? (
-        <span className="mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-full bg-teal-wash text-teal group-hover:bg-surface">
-          {icon}
-        </span>
-      ) : null}
+      {icon ? <span className="mt-1 shrink-0 text-teal">{icon}</span> : null}
       <span className="min-w-0 flex-1">
-        <span className="block font-display text-lg font-semibold leading-snug">{title}</span>
+        <span className="block font-display text-xl font-medium leading-snug tracking-[-0.012em]">{title}</span>
         {detail ? <span className="mt-1 block text-[0.9375rem] leading-snug text-ink-soft">{detail}</span> : null}
         {meta ? <span className="mt-2 block text-sm text-ink-faint">{meta}</span> : null}
       </span>
+      <ArrowRight
+        aria-hidden="true"
+        className="mt-1.5 size-5 shrink-0 text-ink-faint transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink"
+      />
     </Link>
   );
 }
@@ -72,7 +72,7 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="mb-6 sm:mb-8">
+    <header className="mb-8 sm:mb-10">
       {back ? (
         <Link
           href={back.href}
@@ -83,20 +83,20 @@ export function PageHeader({
         </Link>
       ) : null}
       {eyebrow ? (
-        <p className="mb-1 text-sm font-semibold uppercase tracking-[0.08em] text-ink-faint">{eyebrow}</p>
+        <p className="mb-2 text-sm font-semibold text-teal">{eyebrow}</p>
       ) : null}
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h1 className="text-[1.875rem] sm:text-4xl">{title}</h1>
+        <h1 className="text-[2.25rem] leading-[1.05] sm:text-5xl">{title}</h1>
         {actions}
       </div>
-      {lead ? <p className="mt-3 max-w-prose text-lg text-ink-soft">{lead}</p> : null}
+      {lead ? <p className="mt-4 max-w-[34rem] text-lg leading-relaxed text-ink-soft sm:text-xl">{lead}</p> : null}
     </header>
   );
 }
 
 export function SectionTitle({ children, id, className }: { children: ReactNode; id?: string; className?: string }) {
   return (
-    <h2 id={id} className={cx("text-2xl", className)}>
+    <h2 id={id} className={cx("text-[1.625rem]", className)}>
       {children}
     </h2>
   );

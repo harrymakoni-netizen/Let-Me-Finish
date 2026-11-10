@@ -11,7 +11,7 @@ test("first session without a voice sample, then a typed conversation that waits
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Go to Home" }).click();
-  await expect(page.getByRole("heading", { name: /Hello/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Good (morning|afternoon|evening)|Still up/ })).toBeVisible();
 
   await page.goto("/talk/session?scenario=coffee-order");
   await page.getByRole("button", { name: "Start the conversation" }).click();

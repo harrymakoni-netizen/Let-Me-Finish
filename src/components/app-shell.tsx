@@ -115,11 +115,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="lg:grid lg:min-h-dvh lg:grid-cols-[17rem_1fr]">
+    <div className="lg:grid lg:min-h-dvh lg:grid-cols-[18rem_1fr]">
       <SkipLink />
 
       {/* Wide screens: a calm side rail. */}
-      <aside className="no-print hidden border-r border-line bg-surface lg:flex lg:flex-col lg:px-4 lg:py-6">
+      <aside className="no-print hidden border-r border-line bg-paper lg:flex lg:flex-col lg:px-8 lg:py-8">
         <Wordmark className="px-2" />
         <nav aria-label="Main" className="mt-8 flex-1">
           <ul className="space-y-1">
@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <OfflineNotice />
         <StorageNotice />
 
-        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-6 outline-none sm:px-6 lg:pb-12 lg:pt-10">
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-3xl flex-1 px-5 pb-28 pt-8 outline-none sm:px-8 lg:pb-16 lg:pt-14">
           <Gate>{children}</Gate>
         </main>
 
@@ -192,8 +192,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <span
                       className={cx(
-                        "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
-                        active && "bg-teal-wash",
+                        "relative flex h-7 w-12 items-center justify-center",
+                        "after:absolute after:-top-2 after:h-[3px] after:w-8 after:rounded-full after:transition-colors",
+                        active ? "after:bg-teal" : "after:bg-transparent",
                       )}
                     >
                       <Icon aria-hidden="true" className="size-[1.375rem]" />
@@ -218,8 +219,9 @@ function RailLink({ item, active }: { item: NavItem; active: boolean }) {
         href={item.href}
         aria-current={active ? "page" : undefined}
         className={cx(
-          "flex min-h-12 items-center gap-3 rounded-control px-3 font-semibold transition-colors",
-          active ? "bg-teal-wash text-ink" : "text-ink-soft hover:bg-sunk hover:text-ink",
+          "relative flex min-h-12 items-center gap-3 rounded-control px-3 font-medium transition-colors",
+          "before:absolute before:-left-4 before:top-2.5 before:h-7 before:w-[3px] before:rounded-full before:transition-colors",
+          active ? "text-ink before:bg-teal" : "text-ink-soft before:bg-transparent hover:text-ink",
         )}
       >
         <Icon aria-hidden="true" className={cx("size-5", active && "text-teal")} />
