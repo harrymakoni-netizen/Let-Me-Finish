@@ -179,6 +179,7 @@ describe("a turn stays open until the person ends it", () => {
       { type: "SPEECH_INTERIM", text: "I I I w" },
       { type: "SPEECH_FINAL", text: "c-c-coffee" },
       { type: "SPEECH_FINAL", text: "" },
+      { type: "SPEECH_SETTLED" },
       { type: "SILENCE_ELAPSED", seconds: 1 },
       { type: "SILENCE_ELAPSED", seconds: 99_999 },
       { type: "RECOGNIZER_STOPPED", reason: "engine" },
@@ -270,6 +271,7 @@ describe("the partner never talks over the person", () => {
       { type: "OPEN_TURN" },
       { type: "SPEECH_INTERIM", text: "um" },
       { type: "SPEECH_FINAL", text: "words" },
+      { type: "SPEECH_SETTLED" },
       { type: "DRAFT_EDIT", text: "typed" },
       { type: "SWITCH_INPUT", via: "text" },
       { type: "SWITCH_INPUT", via: "voice" },
@@ -491,10 +493,15 @@ describe("checking and correcting the transcript", () => {
       openVoiceTurn(),
     );
     expect(state.inputVia).toBe("text");
-    expect(state.draft).toBe("My address is fourteen");
     expect(effects).toContainEqual({ type: "mic.stop", finalize: false });
+    // Once the engine has stopped, any words it never settled on are kept.
+    const settled = run(voice, [{ type: "SPEECH_SETTLED" }], state).state;
+    expect(settled.draft).toBe("My address is fourteen");
+    // If the engine did settle them, they are not counted twice.
+    const finalised = run(voice, [{ type: "SPEECH_FINAL", text: "fourteen" }, { type: "SPEECH_SETTLED" }], state).state;
+    expect(finalised.draft).toBe("My address is fourteen");
 
-    const sent = run(voice, [{ type: "DRAFT_EDIT", text: "My address is 14 Mill Lane" }, { type: "FINISH_TURN" }], state).state;
+    const sent = run(voice, [{ type: "DRAFT_EDIT", text: "My address is 14 Mill Lane" }, { type: "FINISH_TURN" }], settled).state;
     expect(sent.phase).toBe("ai_responding");
     expect(sent.messages.at(-1)?.text).toBe("My address is 14 Mill Lane");
   });

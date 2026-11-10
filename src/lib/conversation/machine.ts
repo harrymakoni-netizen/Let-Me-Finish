@@ -81,6 +81,8 @@ export type MachineEvent =
   | { type: "OPEN_TURN"; via?: "voice" | "text" }
   | { type: "SPEECH_INTERIM"; text: string }
   | { type: "SPEECH_FINAL"; text: string }
+  /** The engine has fully stopped: nothing more will arrive for the words it was still weighing. */
+  | { type: "SPEECH_SETTLED" }
   | { type: "DRAFT_EDIT"; text: string }
   | { type: "SWITCH_INPUT"; via: "voice" | "text" }
   | { type: "FINISH_TURN" }
@@ -357,6 +359,11 @@ export function transition(state: MachineState, event: MachineEvent, config: Mac
       return { state: { ...state, draft: joinWords(state.draft, event.text), interim: "" }, effects: [{ type: "persist" }] };
     }
 
+    case "SPEECH_SETTLED": {
+      if (state.phase !== "user_turn_open" || !state.interim) return same(state);
+      return { state: { ...state, draft: joinWords(state.draft, state.interim), interim: "" }, effects: [{ type: "persist" }] };
+    }
+
     case "DRAFT_EDIT": {
       if (state.phase !== "user_turn_open" && state.phase !== "user_turn_ready") return same(state);
       return { state: { ...state, draft: event.text, interim: "" }, effects: [{ type: "persist" }] };
@@ -366,11 +373,9 @@ export function transition(state: MachineState, event: MachineEvent, config: Mac
       if (state.phase !== "user_turn_open") return same(state);
       if (config.mode === "text" || event.via === state.inputVia) return same(state);
       if (event.via === "text") {
-        // Keep everything heard so far, including words not yet settled.
-        return {
-          state: { ...state, inputVia: "text", draft: joinWords(state.draft, state.interim), interim: "" },
-          effects: state.paused ? [] : [{ type: "mic.stop", finalize: false }],
-        };
+        // Words the engine is still weighing arrive (or are folded in) once it has stopped.
+        if (state.paused) return same({ ...state, inputVia: "text", draft: joinWords(state.draft, state.interim), interim: "" });
+        return { state: { ...state, inputVia: "text" }, effects: [{ type: "mic.stop", finalize: false }] };
       }
       return {
         state: { ...state, inputVia: "voice", error: state.error?.kind === "mic" ? null : state.error },

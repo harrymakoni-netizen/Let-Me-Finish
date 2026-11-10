@@ -30,19 +30,25 @@ const ASKS_CLINICAL =
 const ACKNOWLEDGEMENT = "No problem at all.";
 const AFTER_SCENE = ["Is there anything else you’d like to say?", "Okay.", "Alright."];
 
-function lastBeat(messages: ChatMessage[]): number {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const m = messages[i];
-    if (m.role === "partner" && typeof m.beat === "number") return m.beat;
-  }
-  return 0;
+/**
+ * Which line of the script the conversation has reached. Lines spoken by the
+ * AI partner carry no number, so if the scripted partner takes over part-way
+ * through (the connection dropped, say) it picks up at roughly the same place
+ * instead of starting the scene again.
+ */
+function lastBeat(scenario: Scenario, messages: ChatMessage[]): number {
+  const spoken = messages.filter((m) => m.role === "partner" && !m.aside);
+  const last = spoken[spoken.length - 1];
+  if (!last) return 0;
+  if (typeof last.beat === "number") return last.beat;
+  return Math.max(0, spoken.length - (scenario.opener ? 1 : 0));
 }
 
 export function scriptedReply(scenario: Scenario, messages: ChatMessage[], term: Term): PartnerLine {
   const tx = makeTx(term);
   const said = [...messages].reverse().find((m) => m.role === "user")?.text ?? "";
   const previousLine = [...messages].reverse().find((m) => m.role === "partner" && !m.aside);
-  const beat = lastBeat(messages);
+  const beat = lastBeat(scenario, messages);
 
   if (suggestsCrisis(said)) {
     return { text: CRISIS_REPLY, closing: false, aside: true, beat };
