@@ -77,6 +77,7 @@ export function initialData(now: Date = new Date()): AppData {
     audit: [],
     activeConversation: null,
     savedModuleIds: [],
+    scenes: [],
   };
 }
 
@@ -156,6 +157,7 @@ export function normalise(input: unknown, now: Date = new Date()): AppData {
     audit: arr(raw.audit),
     activeConversation: raw.activeConversation ?? null,
     savedModuleIds: arr<string>(raw.savedModuleIds),
+    scenes: arr(raw.scenes),
   };
 }
 

@@ -154,6 +154,12 @@ export interface CustomScenario {
   whoStarts: "partner" | "user";
 }
 
+/** A scene the person wrote for themselves and kept to use again. */
+export interface SavedScene extends CustomScenario {
+  id: ID;
+  createdAt: ISO;
+}
+
 export interface ConversationSnapshot {
   sessionId: ID;
   scenarioId: string;
@@ -328,4 +334,6 @@ export interface AppData {
   activeConversation: ConversationSnapshot | null;
   /** Lessons the person has saved to come back to. */
   savedModuleIds: string[];
+  /** Scenes the person has written for their own real situations. */
+  scenes: SavedScene[];
 }

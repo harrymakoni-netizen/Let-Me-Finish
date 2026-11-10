@@ -11,6 +11,7 @@ import type {
   CheckIn,
   ConsentPurpose,
   ConversationSnapshot,
+  CustomScenario,
   DailySession,
   DailyStepId,
   FeedbackReport,
@@ -26,6 +27,7 @@ import type {
   Reflection,
   RetentionSettings,
   RoleplaySession,
+  SavedScene,
   SelfRatings,
   Settings,
   StepStatus,
@@ -117,6 +119,8 @@ export interface AppStore {
   finishRoleplay: (session: RoleplaySession) => void;
   rateRoleplay: (id: ID, ratings: SelfRatings, note?: string) => void;
   deleteTranscripts: () => void;
+  saveScene: (scene: CustomScenario, id?: ID) => ID;
+  removeScene: (id: ID) => void;
 
   // journeys
   createJourney: (input: NewJourneyInput) => ID;
@@ -307,6 +311,28 @@ export const useApp = create<AppStore>()(
               "transcripts.deleted",
             ),
           ),
+
+        saveScene: (scene, id) => {
+          const sceneId = id ?? newId();
+          const clean: SavedScene = {
+            id: sceneId,
+            createdAt: nowIso(),
+            title: tidy(scene.title, 140),
+            partner: tidy(scene.partner, 200),
+            setting: tidy(scene.setting, 400),
+            aim: tidy(scene.aim, 400),
+            channel: scene.channel,
+            whoStarts: scene.whoStarts,
+          };
+          mutate((d) => ({
+            ...d,
+            scenes: d.scenes.some((s) => s.id === sceneId)
+              ? d.scenes.map((s) => (s.id === sceneId ? { ...clean, createdAt: s.createdAt } : s))
+              : [...d.scenes, clean],
+          }));
+          return sceneId;
+        },
+        removeScene: (id) => mutate((d) => ({ ...d, scenes: d.scenes.filter((s) => s.id !== id) })),
 
         createJourney: (input) => {
           const id = newId();
