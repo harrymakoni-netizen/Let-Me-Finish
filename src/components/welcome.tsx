@@ -109,6 +109,95 @@ export function Welcome() {
         </div>
       </section>
 
+      <section className="border-t border-line" aria-labelledby="scenes">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <h2 id="scenes" className="max-w-xl text-[2rem] leading-tight sm:text-5xl">
+              Rehearse the moments you usually avoid.
+            </h2>
+            <p className="max-w-sm text-ink-soft">
+              Eleven everyday scenes to start with — or write your own for the conversation you actually have coming up.
+            </p>
+          </div>
+          <ul className="mt-12 grid border-l border-t border-line sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["Ordering a coffee", "Say the drink you really want, and your name for the cup.", "Face to face"],
+              ["Booking by phone", "Ring a surgery, give your details, choose a time.", "Phone call"],
+              ["A job interview", "The questions every interview opens with — and yours.", "Face to face"],
+              ["Asking in class", "Put your hand up and ask what you wanted to ask.", "Face to face"],
+              ["Answering the phone", "Pick up an unexpected call and say the first word.", "Phone call"],
+              ["Telling your manager", "Say it plainly, and name what would help at work.", "Face to face"],
+            ].map(([title, text, channel]) => (
+              <li key={title} className="border-b border-r border-line p-6 sm:p-8">
+                <p className="text-sm font-semibold text-teal">{channel}</p>
+                <h3 className="mt-2 text-2xl">{title}</h3>
+                <p className="mt-2 leading-relaxed text-ink-soft">{text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="bg-panel text-on-panel" aria-labelledby="loop">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+          <h2 id="loop" className="max-w-2xl text-[2rem] leading-tight text-on-panel sm:text-5xl">
+            From rehearsal to the real thing.
+          </h2>
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-on-panel-soft">
+            Pick one conversation that matters to you, and take it one step at a time. Nothing is ever marked as passed
+            or failed.
+          </p>
+          <ol className="mt-12 grid gap-px overflow-hidden rounded-[1.25rem] bg-panel-line sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Prepare", "Decide what you want to get across, and what you might lean on."],
+              ["Rehearse", "Practise it with a partner that waits, as many times as you like."],
+              ["Do it", "Have the real conversation, in your own time. “Not yet” is fine."],
+              ["Reflect", "Look back on whether you said what you wanted — not how it sounded."],
+            ].map(([title, text], i) => (
+              <li key={title} className="bg-panel p-7">
+                <span aria-hidden="true" className="font-display text-sm text-[#7ee0e6]">
+                  Step {i + 1}
+                </span>
+                <h3 className="mt-3 text-2xl text-on-panel">{title}</h3>
+                <p className="mt-2 leading-relaxed text-on-panel-soft">{text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24" aria-labelledby="faq">
+        <div className="grid gap-10 md:grid-cols-[1fr_1.6fr]">
+          <h2 id="faq" className="text-[2rem] leading-tight sm:text-5xl">Straight answers.</h2>
+          <div className="border-t border-line">
+            {[
+              ["Will this cure my stammer?", "No, and we won’t pretend otherwise. Let Me Finish is a place to practise taking part in the conversations that matter to you. It never measures or scores how you speak."],
+              ["Do I have to speak out loud?", "No. Every part of the app works by typing, and you can switch between speaking and typing in the middle of a turn."],
+              ["Is my voice recorded?", "No. Audio is never saved. Your words are turned into text only while you practise, and transcripts are kept only if you choose to keep them."],
+              ["Do I need an account?", "No. Start as a guest — everything stays on your device, and you can export or delete it whenever you like."],
+              ["Does it replace speech therapy?", "No. It’s a practice companion. A qualified speech and language therapist can assess and support you in ways an app can’t, and the Support page lists organisations that can help."],
+            ].map(([q, a]) => (
+              <details key={q} className="group border-b border-line">
+                <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 py-4 font-display text-xl [&::-webkit-details-marker]:hidden">
+                  {q}
+                  <span aria-hidden="true" className="text-2xl text-ink-faint transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="max-w-xl pb-5 leading-relaxed text-ink-soft">{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="glow relative isolate overflow-hidden bg-panel text-on-panel">
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-8 px-5 py-16 sm:px-8 sm:py-20">
+          <h2 className="max-w-xl text-[2rem] leading-tight text-on-panel sm:text-5xl">Take your time. We’ll wait.</h2>
+          <ButtonLink href="/start" variant="light" size="xl">
+            Start as a guest
+          </ButtonLink>
+        </div>
+      </section>
+
       <section className="border-t border-line bg-sunk">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:px-8 md:grid-cols-[1fr_1.4fr]">
           <h2 className="text-[1.75rem] leading-tight sm:text-4xl">Honest about what it is.</h2>

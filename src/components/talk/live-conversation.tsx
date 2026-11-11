@@ -17,7 +17,7 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react"
 import { ReportDialog } from "@/components/report-dialog";
 import { SupportPanel } from "@/components/support-panel";
 import { Button } from "@/components/ui/button";
-import { Callout, Tag } from "@/components/ui/layout";
+import { Callout } from "@/components/ui/layout";
 import type { Scenario } from "@/lib/content/scenarios";
 import type { ConversationController } from "@/lib/conversation/controller";
 import type { MachineState } from "@/lib/conversation/machine";
@@ -77,16 +77,19 @@ export function LiveConversation({
   return (
     <div className="flex flex-1 flex-col">
       {/* Pause and End stay within reach however long the conversation gets. */}
-      <header className="sticky top-0 z-10 -mx-4 -mt-4 flex items-start justify-between gap-3 border-b border-line bg-paper px-4 pb-3 pt-4 sm:-mx-6 sm:px-6">
-        <div className="min-w-0">
-          <h1 className="text-lg leading-snug sm:text-2xl">{tx(scenario.title)}</h1>
-          <p className="mt-0.5 flex flex-wrap items-center gap-2 text-[0.9375rem] text-ink-soft">
-            {scenario.channel === "phone" ? <Phone aria-hidden="true" className="size-4" /> : null}
-            <span>With {scenario.partner}</span>
-            <Tag tone={view.partner === "ai" ? "violet" : "plain"}>
-              {view.partner === "ai" ? "AI partner" : "Scripted partner"}
-            </Tag>
-          </p>
+      <header className="sticky top-0 z-10 -mx-4 -mt-4 flex items-center justify-between gap-3 border-b border-line bg-paper/95 px-4 pb-3 pt-4 backdrop-blur sm:-mx-6 sm:px-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <Monogram name={partnerName} phone={scenario.channel === "phone"} />
+          <div className="min-w-0">
+            <h1 className="truncate text-lg leading-tight tracking-[-0.015em] sm:text-[1.375rem]">{tx(scenario.title)}</h1>
+            <p className="mt-0.5 truncate text-sm text-ink-soft">
+              {scenario.partner}
+              <span aria-hidden="true"> · </span>
+              <span className={view.partner === "ai" ? "text-violet" : undefined}>
+                {view.partner === "ai" ? "AI partner" : "Scripted partner"}
+              </span>
+            </p>
+          </div>
         </div>
         <div className="flex shrink-0 gap-2">
           {m.paused ? null : (
@@ -122,10 +125,10 @@ export function LiveConversation({
         // When the partner's voice is reading replies aloud, a screen reader
         // announcing them as well would say everything twice.
         aria-live={spoken ? "off" : "polite"}
-        className="mt-4 min-h-40 flex-1 space-y-3 pb-4"
+        className="mt-6 min-h-40 flex-1 space-y-6 pb-6"
       >
         {m.messages.length === 0 && !streaming ? (
-          <p className="pt-6 text-center text-ink-soft">
+          <p className="pt-10 text-center font-display text-xl text-ink-soft">
             {scenario.whoStarts === "user" ? scenario.userOpensWith : `${partnerName} will speak first.`}
           </p>
         ) : null}
@@ -150,9 +153,9 @@ export function LiveConversation({
           />
         ))}
         {streaming ? (
-          <div className="max-w-[88%] rounded-2xl rounded-tl-md border border-line bg-surface px-4 py-3" aria-hidden="true">
+          <div className="max-w-[34rem]" aria-hidden="true">
             <p className="text-sm font-semibold text-ink-faint">{partnerName}</p>
-            <p>{streaming}</p>
+            <p className="mt-1 text-[1.1875rem] leading-relaxed">{streaming}</p>
           </div>
         ) : null}
         {view.supportSuggested ? <SupportPanel /> : null}
@@ -204,28 +207,31 @@ function Bubble({
     return (
       <div
         className={cx(
-          "group max-w-[88%] rounded-2xl rounded-tl-md border px-4 py-3",
-          message.aside ? "border-teal/50 bg-teal-wash" : "border-line bg-surface",
+          "group max-w-[34rem] fade-in",
+          message.aside && "rounded-card border border-teal/40 bg-teal-wash px-5 py-4",
         )}
       >
         <p className="text-sm font-semibold text-ink-faint">
           {message.aside ? "Stepping out of the scene" : partnerName}
         </p>
-        <p className="whitespace-pre-wrap">{message.aside ? text.charAt(0).toUpperCase() + text.slice(1) : text}</p>
+        <p className="mt-1 whitespace-pre-wrap text-[1.1875rem] leading-relaxed">
+          {message.aside ? text.charAt(0).toUpperCase() + text.slice(1) : text}
+        </p>
         <button
           type="button"
           onClick={onFlag}
-          className="-mb-1 -ml-1.5 mt-1 inline-flex min-h-9 items-center gap-1.5 rounded-control px-1.5 text-sm text-ink-faint hover:bg-sunk hover:text-ink"
+          className="-ml-1.5 mt-0.5 inline-flex min-h-9 items-center gap-1.5 rounded-control px-1.5 text-sm text-ink-faint opacity-70 transition-opacity hover:bg-sunk hover:text-ink hover:opacity-100 focus-visible:opacity-100"
         >
           <Flag aria-hidden="true" className="size-3.5" />
-          Report this reply
+          Report
+          <span className="sr-only"> this reply</span>
         </button>
       </div>
     );
   }
   return (
-    <div className="ml-auto max-w-[88%] rounded-2xl rounded-tr-md bg-teal-wash px-4 py-3">
-      <p className="text-sm font-semibold text-ink-faint">You{message.edited ? " · corrected" : ""}</p>
+    <div className="fade-in ml-auto max-w-[30rem] rounded-[1.25rem] rounded-br-md bg-ink px-5 py-3.5 text-paper">
+      <p className="text-sm font-semibold opacity-70">You{message.edited ? " · corrected" : ""}</p>
       {editing !== null ? (
         <div>
           <label htmlFor={editId} className="sr-only">
@@ -237,7 +243,7 @@ function Bubble({
             rows={3}
             value={editing}
             onChange={(e) => onEditChange(e.target.value)}
-            className="mt-1 w-full rounded-control border border-line-strong bg-surface px-3 py-2"
+            className="mt-1 w-full rounded-control border border-line-strong bg-surface px-3 py-2 text-ink"
           />
           <div className="mt-2 flex flex-wrap gap-2">
             <Button size="sm" onClick={onEditSave} disabled={!editing.trim()}>
@@ -250,12 +256,12 @@ function Bubble({
         </div>
       ) : (
         <>
-          <p className="whitespace-pre-wrap">{message.text}</p>
+          <p className="whitespace-pre-wrap text-[1.0625rem] leading-relaxed">{message.text}</p>
           {onEdit ? (
             <button
               type="button"
               onClick={onEdit}
-              className="-mb-1 -ml-1.5 mt-1 inline-flex min-h-9 items-center gap-1.5 rounded-control px-1.5 text-sm text-ink-soft hover:bg-surface hover:text-ink"
+              className="-mb-1 -ml-1.5 mt-1 inline-flex min-h-9 items-center gap-1.5 rounded-control px-1.5 text-sm opacity-80 hover:bg-paper/10 hover:opacity-100"
             >
               <Pencil aria-hidden="true" className="size-3.5" />
               That’s not what I said — correct it
@@ -302,7 +308,9 @@ function TurnPanel({
     else primaryRef.current?.focus();
   }, [focusKey, m.phase, m.inputVia, m.paused]);
 
-  const wrap = "safe-bottom sticky bottom-0 -mx-4 -mb-8 border-t border-line bg-paper px-4 pt-3 sm:-mx-6 sm:px-6";
+  const wrap =
+    "safe-bottom sticky bottom-0 -mx-4 -mb-8 border-t border-line bg-paper/95 px-4 pt-4 backdrop-blur sm:-mx-6 sm:px-6 " +
+    "shadow-[0_-12px_32px_-20px_rgb(16_36_58/0.25)]";
 
   if (m.paused) {
     return (
@@ -380,7 +388,7 @@ function TurnPanel({
           rows={3}
           value={m.draft}
           onChange={(e) => controller.dispatch({ type: "DRAFT_EDIT", text: e.target.value })}
-          className="mt-1 w-full rounded-control border border-line-strong bg-surface px-4 py-3"
+          className="mt-2 w-full rounded-card border border-line-strong bg-surface px-5 py-4 text-[1.0625rem] leading-relaxed"
         />
         <div className="mt-3 flex flex-wrap gap-2">
           <Button
@@ -437,21 +445,22 @@ function TurnPanel({
                   controller.dispatch({ type: "FINISH_TURN" });
                 }
               }}
-              className="mt-2 w-full rounded-control border border-line-strong bg-surface px-4 py-3"
+              className="mt-3 w-full rounded-card border border-line-strong bg-surface px-5 py-4 text-[1.0625rem] leading-relaxed"
             />
           </>
         ) : (
           <>
             <p role="status" className="flex items-center gap-2.5 font-semibold">
-              <span aria-hidden="true" className="relative flex size-3">
-                <span className="absolute inset-0 rounded-full bg-teal" />
+              <span aria-hidden="true" className="relative flex size-4 items-center justify-center">
+                <span className="breathe absolute inset-0 rounded-full bg-teal/30" />
+                <span className="relative size-2 rounded-full bg-teal" />
               </span>
               Your turn. Listening — for as long as you need.
             </p>
             <p id={hintId} className="text-[0.9375rem] text-ink-soft">
               Silence never ends your turn. Only “I’m finished” does.
             </p>
-            <div className="mt-2 min-h-[4.5rem] rounded-control border border-line bg-surface px-4 py-3">
+            <div className="mt-3 min-h-[4.5rem] rounded-card border border-line bg-surface px-5 py-4 text-[1.0625rem]">
               {showWords ? (
                 heard ? (
                   <p>
@@ -617,4 +626,16 @@ function useKeepAwake(active: boolean) {
       void lock?.release().catch(() => {});
     };
   }, [active]);
+}
+
+/** The partner's initial in a quiet circle; a phone glyph for calls. */
+function Monogram({ name, phone }: { name: string; phone: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex size-11 shrink-0 items-center justify-center rounded-full bg-panel font-display text-lg text-on-panel"
+    >
+      {phone ? <Phone className="size-[1.125rem]" /> : name.trim().charAt(0).toUpperCase()}
+    </span>
+  );
 }

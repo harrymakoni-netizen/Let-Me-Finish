@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { ConsentCard } from "@/components/consent-card";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { RatingScale, Segmented, TextArea } from "@/components/ui/form";
-import { Callout, Card } from "@/components/ui/layout";
+import { Callout } from "@/components/ui/layout";
 import { RATING_ITEMS, RATING_ORDER } from "@/lib/content/options";
 import { ROLE_LABELS, type Scenario } from "@/lib/content/scenarios";
 import {
@@ -25,7 +25,6 @@ import { ring } from "@/lib/speech/ring";
 import { englishVoices, loadVoices } from "@/lib/speech/speaker";
 import { makeTx } from "@/lib/terms";
 import type { ListenerManner, SelfRatings } from "@/lib/types";
-import { formatDuration } from "@/lib/util";
 import { LiveConversation } from "./live-conversation";
 
 /** What this browser and this deployment can offer, discovered once on arrival. */
@@ -292,42 +291,49 @@ function ReadyPanel({
     <div className="pb-6">
       <Link
         href={backHref}
-        className="-ml-2 mb-3 inline-flex min-h-11 items-center gap-1.5 rounded-control px-2 text-[0.9375rem] font-semibold text-teal hover:bg-teal-wash"
+        className="-ml-2 mb-6 inline-flex min-h-11 items-center gap-1.5 rounded-control px-2 text-[0.9375rem] font-semibold text-ink-soft hover:text-ink"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
         Back
       </Link>
-      <p className="mb-1 text-sm font-semibold uppercase tracking-[0.08em] text-ink-faint">
-        {scenario.channel === "phone" ? "Phone call" : "Face to face"} · {ROLE_LABELS[scenario.role]}
+      <p className="text-sm font-semibold text-teal">
+        {scenario.channel === "phone" ? "Phone call" : "Face to face"} · {ROLE_LABELS[scenario.role]} · about {scenario.minutes} min
       </p>
-      <h1 className="text-[1.875rem] sm:text-4xl">{tx(scenario.title)}</h1>
-      <p className="mt-3 max-w-prose text-lg text-ink-soft">{tx(scenario.setting)}</p>
-      <p className="mt-1 max-w-prose text-ink-soft">
-        You’ll be talking with <strong className="font-semibold text-ink">{scenario.partner}</strong>.
-      </p>
+      <h1 className="mt-2 text-[2.5rem] leading-[1.02] sm:text-6xl">{tx(scenario.title)}</h1>
+      <p className="mt-5 max-w-xl font-display text-xl leading-snug text-ink-soft sm:text-2xl">{tx(scenario.setting)}</p>
+
+      <div className="mt-8 flex items-center gap-4 border-y border-line py-5">
+        <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-full bg-panel font-display text-2xl text-on-panel">
+          {scenario.channel === "phone" ? <Phone className="size-6" /> : partnerName.charAt(0)}
+        </span>
+        <div>
+          <p className="text-sm text-ink-faint">You’ll be talking with</p>
+          <p className="font-display text-xl">{scenario.partner}</p>
+        </div>
+      </div>
 
       {resuming ? (
-        <Callout tone="info" className="mt-5" title="You were part-way through">
+        <Callout tone="info" className="mt-6" title="You were part-way through">
           <p>Everything said so far is still here. Carry on from where you stopped.</p>
         </Callout>
       ) : null}
 
       {scenario.tryThis.length > 0 && !resuming ? (
-        <Card className="mt-5">
-          <h2 className="text-xl">Ideas, if you want one</h2>
-          <ul className="mt-2 list-disc space-y-1.5 pl-5">
+        <section className="mt-8" aria-labelledby="ideas">
+          <h2 id="ideas" className="text-2xl">Ideas, if you want one</h2>
+          <ul className="mt-3">
             {scenario.tryThis.map((idea) => (
-              <li key={idea}>{tx(idea)}</li>
+              <li key={idea} className="border-t border-line py-3 first:border-t-0 text-[1.0625rem]">
+                {tx(idea)}
+              </li>
             ))}
           </ul>
-          <p className="mt-3 text-[0.9375rem] text-ink-soft">
-            These are only ideas. However the conversation goes is fine.
-          </p>
-        </Card>
+          <p className="mt-1 text-[0.9375rem] text-ink-faint">Only ideas. However the conversation goes is fine.</p>
+        </section>
       ) : null}
 
-      <Card className="mt-4 space-y-5">
-        <h2 className="text-xl">How you’ll take part</h2>
+      <section className="mt-10 space-y-6" aria-labelledby="how">
+        <h2 id="how" className="text-2xl">How you’ll take part</h2>
         <Segmented
           legend="Speak or type"
           options={[
@@ -369,28 +375,6 @@ function ReadyPanel({
           </p>
         ) : null}
 
-        <div className="border-t border-line pt-4">
-          <p className="font-semibold">Your partner: {partner === "ai" ? "AI partner" : "scripted partner"}</p>
-          <p className="mt-0.5 text-[0.9375rem] text-ink-soft">
-            {partner === "ai"
-              ? "Replies are written by an AI that responds to what you actually say."
-              : !online
-                ? "You’re offline, so this scene follows a script. It works without a connection and sends nothing anywhere."
-                : caps.ai === null
-                  ? "Checking whether the AI partner is available…"
-                  : !caps.ai
-                    ? "The AI partner isn’t set up on this copy of the app, so this scene follows a script. Nothing is sent anywhere."
-                    : scriptedOnly
-                      ? "You’ve chosen to keep conversations on this device, so this scene follows a script."
-                      : "This scene will follow a script unless you switch on the AI partner below."}
-          </p>
-          {aiReachable && !scriptedOnly ? (
-            <div className="mt-3">
-              <ConsentCard purpose="ai" allowLabel="Use the AI partner" />
-            </div>
-          ) : null}
-        </div>
-
         <Segmented<ListenerManner>
           legend={`How ${partnerName} comes across`}
           options={[
@@ -406,16 +390,35 @@ function ReadyPanel({
             Brisk means short and businesslike, like a busy day. They still never hurry you.
           </p>
         ) : null}
-      </Card>
 
-      <Callout tone="info" className="mt-4">
-        <p>
-          You set the pace. {partnerName} replies only after you press <strong>I’m finished</strong> — silence never
-          ends your turn. You can pause or stop at any moment.
+        <div className="border-t border-line pt-5">
+          <p className="font-semibold">Partner: {partner === "ai" ? "AI partner" : "scripted partner"}</p>
+          <p className="mt-0.5 text-[0.9375rem] text-ink-soft">
+            {partner === "ai"
+              ? "Replies are written by an AI that responds to what you actually say."
+              : !online
+                ? "You’re offline, so this scene follows a script. It works without a connection and sends nothing anywhere."
+                : caps.ai === null
+                  ? "Checking whether the AI partner is available…"
+                  : !caps.ai
+                    ? "This scene follows a script. It sends nothing anywhere."
+                    : scriptedOnly
+                      ? "You’ve chosen to keep conversations on this device, so this scene follows a script."
+                      : "This scene will follow a script unless you switch on the AI partner below."}
+          </p>
+          {aiReachable && !scriptedOnly ? (
+            <div className="mt-3">
+              <ConsentCard purpose="ai" allowLabel="Use the AI partner" />
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <div className="safe-bottom sticky bottom-0 -mx-4 mt-10 border-t border-line bg-paper/95 px-4 pt-4 backdrop-blur sm:-mx-6 sm:px-6">
+        <p className="mb-3 text-[0.9375rem] text-ink-soft">
+          {partnerName} replies only after you press <strong className="font-semibold text-ink">I’m finished</strong>. Silence
+          never ends your turn.
         </p>
-      </Callout>
-
-      <div className="mt-5">
         <Button size="xl" block onClick={() => onBegin({ mode, partner })}>
           {resuming ? "Carry on" : scenario.channel === "phone" ? (scenario.whoStarts === "user" ? "Wait for the call" : "Make the call") : "Start the conversation"}
         </Button>
@@ -460,12 +463,25 @@ function WrapUp({
 
   return (
     <div className="pb-8">
-      <h1 className="text-[1.875rem] sm:text-4xl">That’s the conversation done</h1>
-      <p className="mt-3 text-lg text-ink-soft">
-        {tx(scenario.title)}
-        {summary ? ` · ${summary.turns} ${summary.turns === 1 ? "turn" : "turns"} · ${formatDuration(summary.seconds)}` : ""}
-      </p>
-      <p className="mt-1 text-[0.9375rem] text-ink-soft">
+      <p className="text-sm font-semibold text-teal">Conversation complete</p>
+      <h1 className="mt-2 text-[2.5rem] leading-[1.02] sm:text-6xl">You saw it through.</h1>
+      <p className="mt-4 font-display text-xl text-ink-soft">{tx(scenario.title)}</p>
+      {summary ? (
+        <dl className="mt-8 grid grid-cols-2 border-y border-line">
+          <div className="py-5 pr-4">
+            <dt className="text-sm text-ink-faint">Turns you took</dt>
+            <dd className="mt-1 font-display text-5xl font-medium tracking-[-0.03em]">{summary.turns}</dd>
+          </div>
+          <div className="border-l border-line py-5 pl-5">
+            <dt className="text-sm text-ink-faint">Time, at your pace</dt>
+            <dd className="mt-1 font-display text-5xl font-medium tracking-[-0.03em]">
+              {Math.max(1, Math.round(summary.seconds / 60))}
+              <span className="ml-1 text-2xl text-ink-soft">min</span>
+            </dd>
+          </div>
+        </dl>
+      ) : null}
+      <p className="mt-4 text-[0.9375rem] text-ink-faint">
         {keepsText
           ? days === 0
             ? "The text of this conversation is saved on this device until you delete it."
@@ -473,9 +489,9 @@ function WrapUp({
           : "The text of this conversation has not been kept."}
       </p>
 
-      <Card className="mt-6 space-y-6">
+      <section className="mt-12 space-y-7">
         <div>
-          <h2 className="text-xl">How was that for you?</h2>
+          <h2 className="text-[1.75rem]">How was that for you?</h2>
           <p className="mt-1 text-[0.9375rem] text-ink-soft">
             Entirely optional, and only ever your own view. Nothing about your speech was measured.
           </p>
@@ -505,9 +521,9 @@ function WrapUp({
           maxLength={1000}
           rows={3}
         />
-      </Card>
+      </section>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-10 flex flex-wrap gap-3">
         <Button size="lg" onClick={() => finish(doneHref)}>
           Done
         </Button>

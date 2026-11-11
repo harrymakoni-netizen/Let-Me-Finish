@@ -6,10 +6,9 @@ import { CONSENTS } from "@/lib/consent";
 import { EXPERIENCE_OPTIONS, GOAL_OPTIONS, REGION_OPTIONS, SITUATION_OPTIONS } from "@/lib/content/options";
 import { guessLocaleDefaults } from "@/lib/data";
 import { useApp, useData, useHydrated, useTx } from "@/lib/hooks";
-import { ConsentText } from "./consent-card";
 import { Button } from "./ui/button";
 import { ChoiceCards, ChoiceChips, Segmented, Select } from "./ui/form";
-import { Callout, StepProgress } from "./ui/layout";
+import { StepProgress } from "./ui/layout";
 
 const STEPS = ["You and this app", "Your goals", "Your speech", "Ready"] as const;
 
@@ -37,21 +36,29 @@ export function Onboarding() {
       <StepProgress current={step + 1} total={STEPS.length} label={STEPS[step]} />
       {step === 0 ? (
         <section className="space-y-5" aria-labelledby="s0">
-          <h1 id="s0" className="text-3xl">Before we begin</h1>
-          <label className="flex min-h-12 items-start gap-3">
-            <input type="checkbox" className="mt-1 size-5" checked={adult} onChange={(e) => setAdult(e.target.checked)} />
-            <span>I’m 18 or over. (This app is for adults only.)</span>
-          </label>
-          <div>
-            <ConsentText purpose="core" />
-            <label className="mt-3 flex min-h-12 items-start gap-3">
-              <input type="checkbox" className="mt-1 size-5" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-              <span>{CONSENTS.core.title}: I understand and agree.</span>
-            </label>
+          <h1 id="s0" className="text-[2.5rem] leading-[1.02] sm:text-5xl">Before we begin.</h1>
+          <p className="max-w-lg text-lg leading-relaxed text-ink-soft">
+            Two quick things. There’s no voice sample, and nothing here is timed.
+          </p>
+          <div className="space-y-3">
+            <CheckRow checked={adult} onChange={setAdult}>
+              I’m 18 or over.
+            </CheckRow>
+            <CheckRow checked={agree} onChange={setAgree}>
+              I understand Let Me Finish is a practice companion — not a medical service, a diagnosis or a treatment.
+            </CheckRow>
           </div>
-          <Callout tone="note">
-            <p>No voice sample is needed. Microphone use is asked about separately, only if you choose to speak.</p>
-          </Callout>
+          <details className="group">
+            <summary className="inline-flex min-h-11 cursor-pointer items-center font-semibold text-teal underline underline-offset-4">
+              What happens to my information
+            </summary>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[0.9375rem] text-ink-soft">
+              {CONSENTS.core.details.map((d) => (
+                <li key={d}>{tx(d)}</li>
+              ))}
+              <li>The microphone and the AI partner are each asked about separately, only if you choose to use them.</li>
+            </ul>
+          </details>
           <Button
             size="lg"
             disabled={!adult || !agree}
@@ -114,5 +121,18 @@ function Nav({ onBack, onNext, skip }: { onBack: () => void; onNext: () => void;
       <Button variant="secondary" size="lg" onClick={onBack}>Back</Button>
       <Button size="lg" onClick={onNext}>{skip ? "Continue" : "Next"}</Button>
     </div>
+  );
+}
+
+function CheckRow({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
+  return (
+    <label
+      className={`flex min-h-16 cursor-pointer items-start gap-4 rounded-card border px-5 py-4 text-[1.0625rem] leading-snug transition-colors has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-focus ${
+        checked ? "border-ink bg-surface" : "border-line-strong hover:border-ink"
+      }`}
+    >
+      <input type="checkbox" className="mt-0.5 size-5 shrink-0" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <span>{children}</span>
+    </label>
   );
 }

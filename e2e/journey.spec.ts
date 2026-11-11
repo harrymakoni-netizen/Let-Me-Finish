@@ -4,9 +4,9 @@ import { expect, test } from "@playwright/test";
 test("first session without a voice sample, then a typed conversation that waits", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Let Me Finish." })).toBeVisible();
-  await page.getByRole("link", { name: "Start as a guest" }).click();
+  await page.getByRole("link", { name: "Start as a guest" }).first().click();
   await page.getByLabel(/I’m 18 or over/).check();
-  await page.getByLabel(/I understand and agree/).check();
+  await page.getByLabel(/practice companion/).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Continue" }).click();

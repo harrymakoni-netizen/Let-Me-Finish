@@ -26,6 +26,15 @@ export const metadata: Metadata = {
   description:
     "A patient, private speech companion for adults who stammer. Practise real conversations with a partner that waits until you have finished.",
   applicationName: "Let Me Finish",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  openGraph: {
+    type: "website",
+    siteName: "Let Me Finish",
+    title: "Let Me Finish — your voice, your words, your pace",
+    description:
+      "Practise real conversations with a partner that waits until you say you’ve finished. Private, free to try, no account needed.",
+  },
+  twitter: { card: "summary_large_image" },
   appleWebApp: { capable: true, title: "Let Me Finish", statusBarStyle: "default" },
   formatDetection: { telephone: false },
   icons: {
